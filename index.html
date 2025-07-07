@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GPT Calculator - Gravitational Pulse Theory</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #101010; color: #eee; }
+    label, select, input { display: block; margin: 10px 0; }
+    input, select { padding: 6px; width: 300px; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 20px; cursor: pointer; }
+    .result { margin-top: 30px; font-size: 1.2em; color: #0f0; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Gravitational Pulse Theory (GPT) Calculator</h1>
+
+  <label>Pulse Energy:</label>
+  <input type="number" id="energy" placeholder="e.g. 2.4" step="any" min="0" />
+  <select id="energyUnit">
+    <option value="1e-3">mJ</option>
+    <option value="1">J</option>
+    <option value="1e3">kJ</option>
+    <option value="1e6">MJ</option>
+    <option value="1e9">GJ</option>
+    <option value="1e12">TJ</option>
+    <option value="1e15">PJ</option>
+    <option value="1e18">EJ</option>
+    <option value="1e21">ZJ</option>
+    <option value="1e24">YJ</option>
+  </select>
+
+  <label>Shockwave Radius:</label>
+  <input type="number" id="radius" placeholder="e.g. 11000" step="any" min="0" />
+  <select id="radiusUnit">
+    <option value="1e-3">mm</option>
+    <option value="1e-2">cm</option>
+    <option value="1">m</option>
+    <option value="1e3">km</option>
+    <option value="1e6">Mm</option>
+    <option value="1e9">Gm</option>
+    <option value="1e12">Tm</option>
+  </select>
+
+  <label>Object Mass:</label>
+  <input type="number" id="mass" placeholder="e.g. 3.8" step="any" min="0" />
+  <select id="massUnit">
+    <option value="1e-3">g</option>
+    <option value="1">kg</option>
+    <option value="1e3">t</option>
+    <option value="1e6">Mt</option>
+    <option value="1e9">Gt</option>
+  </select>
+
+  <label>Object Cross-Section Area:</label>
+  <input type="number" id="area" placeholder="e.g. 17000" step="any" min="0" />
+  <select id="areaUnit">
+    <option value="1e-6">mm²</option>
+    <option value="1e-4">cm²</option>
+    <option value="1">m²</option>
+    <option value="1e6">km²</option>
+  </select>
+
+  <label>Pulse Duration:</label>
+  <input type="number" id="duration" placeholder="e.g. 12" step="any" min="0" />
+  <select id="timeUnit">
+    <option value="1e-3">ms</option>
+    <option value="1">s</option>
+    <option value="60">min</option>
+    <option value="3600">hr</option>
+  </select>
+
+  <button onclick="calculateGPT()">Calculate</button>
+
+  <div class="result" id="output"></div>
+
+  <script>
+    const SI_PREFIXES = [
+      { factor: 1e24, suffix: 'Y' },
+      { factor: 1e21, suffix: 'Z' },
+      { factor: 1e18, suffix: 'E' },
+      { factor: 1e15, suffix: 'P' },
+      { factor: 1e12, suffix: 'T' },
+      { factor: 1e9, suffix: 'G' },
+      { factor: 1e6, suffix: 'M' },
+      { factor: 1e3, suffix: 'k' },
+      { factor: 1, suffix: '' },
+      { factor: 1e-3, suffix: 'm' },
+      { factor: 1e-6, suffix: 'μ' },
+      { factor: 1e-9, suffix: 'n' }
+    ];
+
+    function formatSci(value, unitType) {
+      const abs = Math.abs(value);
+      for (let {factor, suffix} of SI_PREFIXES) {
+        if (abs >= factor) {
+          const num = (value / factor).toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+          return `${num} ${suffix}${unitType}`;
+        }
+      }
+      return value.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 }) + ` ${unitType}`;
+    }
+
+    function calculateGPT() {
+      const E = parseFloat(energy.value) * parseFloat(energyUnit.value);
+      const R = parseFloat(radius.value) * parseFloat(radiusUnit.value);
+      const m = parseFloat(mass.value) * parseFloat(massUnit.value);
+      const A = parseFloat(area.value) * parseFloat(areaUnit.value);
+      const t = parseFloat(duration.value) * parseFloat(timeUnit.value);
+      if ([E,R,m,A,t].some(isNaN)) {
+        output.innerHTML = "<span style='color:red;'>Fill in all values.</span>"; return;
+      }
+      const force = E*A/(R*R);
+      const accel = force/m;
+      const vel = accel*t;
+      const disp = 0.5*accel*t*t;
+      const gpu = E/4.184e10;
+      const gs = accel/9.80665;
+      output.innerHTML = `
+        Force: ${formatSci(force,'N')}<br>
+        Acceleration: ${formatSci(accel,'m/s²')} (${gs.toLocaleString('en-US',{minimumFractionDigits:6})} g)<br>
+        Velocity: ${formatSci(vel,'m/s')}<br>
+        Displacement: ${formatSci(disp,'m')}<br>
+        Energy: ${gpu.toLocaleString('en-US',{minimumFractionDigits:6})} GPU
+      `;
+    }
+  </script>
+</body>
+</html>
